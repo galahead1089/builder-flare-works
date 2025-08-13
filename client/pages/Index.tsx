@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TrendingUp, TrendingDown, Minus, Search, Target, Zap, BarChart3, Brain, Activity, Smartphone, CheckCircle, AlertCircle } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Search, Target, Zap, BarChart3, Brain, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,11 +18,6 @@ interface PredictionResult {
     trend: string;
     volatility: string;
     volume_trend: string;
-  };
-  growwRecommendation?: {
-    canBuy: boolean;
-    steps: string[];
-    notes: string[];
   };
 }
 
