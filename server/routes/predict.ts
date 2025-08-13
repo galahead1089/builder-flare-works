@@ -15,11 +15,17 @@ interface PredictionResponse {
   prediction: "BUY" | "SELL" | "HOLD";
   confidence: number;
   accuracy: number;
+  timeframe: "today" | "tomorrow";
   features: {
     rsi: number;
     trend: string;
     volatility: string;
     volume_trend: string;
+  };
+  growwRecommendation?: {
+    canBuy: boolean;
+    steps: string[];
+    notes: string[];
   };
 }
 
