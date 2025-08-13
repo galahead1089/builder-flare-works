@@ -295,36 +295,50 @@ function makePrediction(stockData: StockData[], timeframe: "today" | "tomorrow")
 
 export const handlePredict: RequestHandler = async (req, res) => {
   try {
-    const { symbol } = req.body;
-    
+    const { symbol, timeframe = "tomorrow" } = req.body;
+
     if (!symbol) {
       return res.status(400).json({ error: "Stock symbol is required" });
     }
-    
+
+    if (!["today", "tomorrow"].includes(timeframe)) {
+      return res.status(400).json({ error: "Timeframe must be 'today' or 'tomorrow'" });
+    }
+
     const stockSymbol = symbol.toUpperCase();
-    
+
     // Fetch stock data
     const stockData = await fetchStockData(stockSymbol);
-    
+
     if (stockData.length === 0) {
       return res.status(404).json({ error: "Stock data not found" });
     }
-    
+
     // Analyze and make prediction
     const features = analyzeStock(stockData);
-    const { prediction, confidence } = makePrediction(stockData);
-    
+    const { prediction, confidence } = makePrediction(stockData, timeframe);
+
+    // Get GROWW specific recommendations
+    const growwRecommendation = getGrowwRecommendation(stockSymbol, prediction);
+
     // Simulate model accuracy (in real app, this would be calculated from backtesting)
-    const accuracy = 75 + Math.random() * 15; // 75-90% range
-    
+    let accuracy = 75 + Math.random() * 15; // 75-90% range
+
+    // Today predictions are typically less accurate
+    if (timeframe === "today") {
+      accuracy *= 0.85; // Reduce accuracy for same-day predictions
+    }
+
     const response: PredictionResponse = {
       symbol: stockSymbol,
       prediction,
       confidence,
       accuracy: Math.round(accuracy * 100) / 100,
-      features
+      timeframe,
+      features,
+      growwRecommendation
     };
-    
+
     res.json(response);
   } catch (error) {
     console.error("Prediction error:", error);
