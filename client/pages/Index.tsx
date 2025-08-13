@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { TrendingUp, TrendingDown, Minus, Search, Target, Zap, BarChart3, Brain, Activity } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { TrendingUp, TrendingDown, Minus, Search, Target, Zap, BarChart3, Brain, Activity, X, Clock, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PredictionSkeleton } from "@/components/PredictionSkeleton";
+import { searchStocks, POPULAR_STOCKS } from "@/lib/stockSuggestions";
 import { cn } from "@/lib/utils";
 
 interface PredictionResult {
@@ -27,27 +30,70 @@ export default function Index() {
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestions, setSuggestions] = useState<typeof POPULAR_STOCKS>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  // Load recent searches from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('recentStockSearches');
+    if (saved) {
+      try {
+        setRecentSearches(JSON.parse(saved));
+      } catch (e) {
+        // Ignore invalid JSON
+      }
+    }
+  }, []);
+
+  // Handle clicks outside suggestions
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node) &&
+          inputRef.current && !inputRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handlePredict = async () => {
-    if (!symbol.trim()) {
+    const trimmedSymbol = symbol.trim().toUpperCase();
+    if (!trimmedSymbol) {
       setError("Please enter a stock symbol");
       return;
     }
 
     setLoading(true);
     setError("");
+    setShowSuggestions(false);
+
+    // Add to recent searches
+    const newRecentSearches = [trimmedSymbol, ...recentSearches.filter(s => s !== trimmedSymbol)].slice(0, 5);
+    setRecentSearches(newRecentSearches);
+    localStorage.setItem('recentStockSearches', JSON.stringify(newRecentSearches));
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch("/api/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          symbol: symbol.trim(),
+          symbol: trimmedSymbol,
           timeframe
         }),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -57,16 +103,49 @@ export default function Index() {
       const result = await response.json();
       setPrediction(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          setError("Request timed out. Please try again.");
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError("An unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !showSuggestions) {
       handlePredict();
+    } else if (e.key === "Escape") {
+      setShowSuggestions(false);
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toUpperCase();
+    setSymbol(value);
+
+    if (value.trim()) {
+      const searchResults = searchStocks(value);
+      setSuggestions(searchResults);
+      setShowSuggestions(searchResults.length > 0);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (stockSymbol: string) => {
+    setSymbol(stockSymbol);
+    setShowSuggestions(false);
+    inputRef.current?.focus();
+  };
+
+  const clearError = () => {
+    setError("");
   };
 
   const getPredictionColor = (pred: string) => {
