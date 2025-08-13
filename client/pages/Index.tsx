@@ -337,16 +337,26 @@ export default function Index() {
         {prediction && !loading && (
           <div className="space-y-6 mb-12">
             {/* Main Prediction Card */}
-            <Card className="border-2">
+            <Card className={cn(
+              "border-2 transition-all duration-500 animate-in slide-in-from-bottom-4",
+              prediction.prediction === "BUY" ? "border-success/50 bg-success/5" :
+              prediction.prediction === "SELL" ? "border-destructive/50 bg-destructive/5" :
+              "border-warning/50 bg-warning/5"
+            )}>
               <CardHeader className="text-center">
-                <CardTitle className="flex items-center justify-center space-x-2 text-2xl">
-                  <span>{prediction.symbol}</span>
-                  <span className={cn("flex items-center space-x-1", getPredictionColor(prediction.prediction))}>
-                    {getPredictionIcon(prediction.prediction)}
-                    <span>{prediction.prediction}</span>
+                <CardTitle className="flex items-center justify-center space-x-2 text-2xl animate-in fade-in duration-700">
+                  <span className="font-mono tracking-wider">{prediction.symbol}</span>
+                  <span className={cn(
+                    "flex items-center space-x-1 transition-all duration-300 animate-in zoom-in-50",
+                    getPredictionColor(prediction.prediction)
+                  )}>
+                    <span className="animate-pulse">
+                      {getPredictionIcon(prediction.prediction)}
+                    </span>
+                    <span className="font-bold">{prediction.prediction}</span>
                   </span>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="animate-in fade-in duration-500 delay-200">
                   {prediction.timeframe === "today" ? "Today's" : "Tomorrow's"} Trading Recommendation
                 </CardDescription>
               </CardHeader>
