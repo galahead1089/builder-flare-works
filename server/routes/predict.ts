@@ -84,24 +84,44 @@ function calculateBollingerBands(prices: number[], period: number = 20) {
 }
 
 async function fetchStockData(symbol: string): Promise<StockData[]> {
+  const cacheKey = `stock_${symbol}`;
+
+  // Check cache first
+  const cachedData = getCachedData(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+
   try {
     // Using Alpha Vantage API (free tier) - you can replace with other APIs
     const API_KEY = process.env.ALPHA_VANTAGE_API_KEY || "demo";
+
+    if (API_KEY === "demo") {
+      // Generate demo data for popular stocks
+      const stockData = generateDemoData(symbol);
+      setCachedData(cacheKey, stockData);
+      return stockData;
+    }
+
     const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${API_KEY}`;
-    
-    const response = await fetch(url);
+
+    const response = await fetch(url, { timeout: 10000 });
     const data = await response.json() as any;
-    
+
     if (data["Error Message"] || data["Note"]) {
       // Fallback to demo data for popular stocks
-      return generateDemoData(symbol);
+      const stockData = generateDemoData(symbol);
+      setCachedData(cacheKey, stockData);
+      return stockData;
     }
-    
+
     const timeSeries = data["Time Series (Daily)"];
     if (!timeSeries) {
-      return generateDemoData(symbol);
+      const stockData = generateDemoData(symbol);
+      setCachedData(cacheKey, stockData);
+      return stockData;
     }
-    
+
     const stockData: StockData[] = Object.entries(timeSeries)
       .slice(0, 100) // Get last 100 days
       .map(([date, values]: [string, any]) => ({
@@ -113,11 +133,15 @@ async function fetchStockData(symbol: string): Promise<StockData[]> {
         volume: parseInt(values["5. volume"])
       }))
       .reverse(); // Oldest first
-    
+
+    // Cache the result
+    setCachedData(cacheKey, stockData);
     return stockData;
   } catch (error) {
     console.error("Error fetching stock data:", error);
-    return generateDemoData(symbol);
+    const stockData = generateDemoData(symbol);
+    setCachedData(cacheKey, stockData);
+    return stockData;
   }
 }
 
