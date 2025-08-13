@@ -406,32 +406,42 @@ export default function Index() {
             </Card>
 
             {/* Technical Analysis Details */}
-            <Card>
+            <Card className="animate-in slide-in-from-bottom-4 delay-300">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Activity className="h-5 w-5" />
+                <CardTitle className="flex items-center space-x-2 animate-in fade-in delay-500">
+                  <Activity className="h-5 w-5 animate-pulse" />
                   <span>Technical Analysis</span>
                 </CardTitle>
-                <CardDescription>Key indicators used in the prediction</CardDescription>
+                <CardDescription className="animate-in fade-in delay-600">
+                  Key indicators used in the prediction
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-4 rounded-lg bg-muted/50">
-                    <div className="text-lg font-semibold mb-1">{prediction.features.rsi}</div>
-                    <div className="text-sm text-muted-foreground">RSI</div>
-                  </div>
-                  <div className="text-center p-4 rounded-lg bg-muted/50">
-                    <div className="text-lg font-semibold mb-1">{prediction.features.trend}</div>
-                    <div className="text-sm text-muted-foreground">Trend</div>
-                  </div>
-                  <div className="text-center p-4 rounded-lg bg-muted/50">
-                    <div className="text-lg font-semibold mb-1">{prediction.features.volatility}</div>
-                    <div className="text-sm text-muted-foreground">Volatility</div>
-                  </div>
-                  <div className="text-center p-4 rounded-lg bg-muted/50">
-                    <div className="text-lg font-semibold mb-1">{prediction.features.volume_trend}</div>
-                    <div className="text-sm text-muted-foreground">Volume</div>
-                  </div>
+                  {[
+                    { label: "RSI", value: prediction.features.rsi, delay: "delay-700" },
+                    { label: "Trend", value: prediction.features.trend, delay: "delay-[800ms]" },
+                    { label: "Volatility", value: prediction.features.volatility, delay: "delay-[900ms]" },
+                    { label: "Volume", value: prediction.features.volume_trend, delay: "delay-[1000ms]" }
+                  ].map((item, index) => (
+                    <div
+                      key={item.label}
+                      className={cn(
+                        "text-center p-4 rounded-lg bg-muted/50 transition-all duration-300",
+                        "hover:bg-muted/70 hover:scale-105 transform",
+                        "animate-in slide-in-from-bottom-2",
+                        item.delay
+                      )}
+                    >
+                      <div className="text-lg font-semibold mb-1">
+                        {typeof item.value === 'number' ?
+                          <CountUpAnimation value={item.value} duration={800} /> :
+                          item.value
+                        }
+                      </div>
+                      <div className="text-sm text-muted-foreground">{item.label}</div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
