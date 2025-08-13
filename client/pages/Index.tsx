@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PredictionSkeleton } from "@/components/PredictionSkeleton";
 import { CountUpAnimation } from "@/components/CountUpAnimation";
+import { PredictionHistory } from "@/components/PredictionHistory";
 import { searchStocks, POPULAR_STOCKS } from "@/lib/stockSuggestions";
 import { cn } from "@/lib/utils";
 
