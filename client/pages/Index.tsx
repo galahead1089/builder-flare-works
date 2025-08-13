@@ -28,6 +28,7 @@ interface PredictionResult {
 
 export default function Index() {
   const [symbol, setSymbol] = useState("");
+  const [timeframe, setTimeframe] = useState<"today" | "tomorrow">("tomorrow");
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -40,14 +41,17 @@ export default function Index() {
 
     setLoading(true);
     setError("");
-    
+
     try {
       const response = await fetch("/api/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ symbol: symbol.trim() }),
+        body: JSON.stringify({
+          symbol: symbol.trim(),
+          timeframe
+        }),
       });
 
       if (!response.ok) {
