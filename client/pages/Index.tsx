@@ -208,8 +208,11 @@ export default function Index() {
               <div className="mb-4">
                 <Tabs value={timeframe} onValueChange={(value) => setTimeframe(value as "today" | "tomorrow")}>
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="today">Today's Prediction</TabsTrigger>
-                    <TabsTrigger value="tomorrow">Tomorrow's Prediction</TabsTrigger>
+                    <TabsTrigger value="today" className="flex items-center space-x-2">
+                      <Clock className="h-4 w-4" />
+                      <span>Today</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="tomorrow">Tomorrow</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
