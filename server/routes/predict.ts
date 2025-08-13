@@ -163,57 +163,6 @@ function analyzeStock(stockData: StockData[]): PredictionResponse["features"] {
   };
 }
 
-// List of popular Indian stocks available on GROWW
-const INDIAN_STOCKS = [
-  'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'HINDUNILVR', 'ITC', 'SBIN', 'BHARTIARTL', 'KOTAKBANK',
-  'LT', 'ASIANPAINT', 'MARUTI', 'AXISBANK', 'HCLTECH', 'ULTRACEMCO', 'SUNPHARMA', 'TITAN',
-  'BAJFINANCE', 'NESTLEIND', 'WIPRO', 'ONGC', 'TECHM', 'NTPC', 'POWERGRID', 'TATAMOTORS',
-  'COALINDIA', 'HDFCLIFE', 'BAJAJFINSV', 'GRASIM', 'ADANIPORTS', 'JSWSTEEL', 'HINDALCO',
-  'BPCL', 'DRREDDY', 'EICHERMOT', 'TATASTEEL', 'CIPLA', 'BRITANNIA', 'DIVISLAB', 'IOC',
-  'APOLLOHOSP', 'BAJAJ-AUTO', 'HEROMOTOCO', 'SBILIFE', 'ICICIBANK', 'M&M', 'INDUSINDBK'
-];
-
-function getGrowwRecommendation(symbol: string, prediction: "BUY" | "SELL" | "HOLD"): PredictionResponse["growwRecommendation"] {
-  const isIndianStock = INDIAN_STOCKS.includes(symbol.toUpperCase());
-
-  if (!isIndianStock) {
-    return {
-      canBuy: false,
-      steps: [],
-      notes: ["This stock may not be available on GROWW app", "GROWW primarily focuses on Indian stock markets"]
-    };
-  }
-
-  if (prediction !== "BUY") {
-    return {
-      canBuy: false,
-      steps: [],
-      notes: ["Current prediction is " + prediction, "Consider waiting for a BUY signal"]
-    };
-  }
-
-  return {
-    canBuy: true,
-    steps: [
-      "Open GROWW app on your mobile",
-      `Search for "${symbol}" in the search bar`,
-      "Check the current market price and day's performance",
-      "Review the stock's fundamentals and charts",
-      "Click on 'BUY' button",
-      "Enter the quantity or amount you want to invest",
-      "Choose between Market Order (immediate) or Limit Order (specific price)",
-      "Review your order details",
-      "Complete the purchase using UPI/Net Banking"
-    ],
-    notes: [
-      "Ensure you have sufficient balance in your GROWW account",
-      "Consider your risk tolerance and investment goals",
-      "This is an AI prediction - do your own research",
-      "Stock markets are subject to market risks"
-    ]
-  };
-}
-
 function makePrediction(stockData: StockData[], timeframe: "today" | "tomorrow"): { prediction: "BUY" | "SELL" | "HOLD", confidence: number } {
   const features = analyzeStock(stockData);
   const closes = stockData.map(d => d.close);
