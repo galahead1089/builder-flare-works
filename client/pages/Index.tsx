@@ -214,29 +214,114 @@ export default function Index() {
                 </Tabs>
               </div>
 
-              <div className="flex space-x-2 mb-4">
-                <Input
-                  placeholder="Enter stock symbol (e.g., AAPL, RELIANCE, TCS)"
-                  value={symbol}
-                  onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-                  onKeyPress={handleKeyPress}
-                  className="flex-1"
-                />
-                <Button
-                  onClick={handlePredict}
-                  disabled={loading}
-                  size="icon"
-                  className="shrink-0"
-                >
-                  {loading ? (
-                    <div className="animate-spin h-4 w-4 border-2 border-background border-t-transparent rounded-full" />
-                  ) : (
-                    <Search className="h-4 w-4" />
-                  )}
-                </Button>
+              <div className="relative mb-4">
+                <div className="flex space-x-2">
+                  <div className="relative flex-1">
+                    <Input
+                      ref={inputRef}
+                      placeholder="Enter stock symbol (e.g., AAPL, RELIANCE, TCS)"
+                      value={symbol}
+                      onChange={handleInputChange}
+                      onKeyPress={handleKeyPress}
+                      onFocus={() => {
+                        if (symbol.trim()) {
+                          const searchResults = searchStocks(symbol);
+                          setSuggestions(searchResults);
+                          setShowSuggestions(searchResults.length > 0);
+                        }
+                      }}
+                      className="pr-8"
+                      autoComplete="off"
+                    />
+                    {symbol && (
+                      <button
+                        onClick={() => {
+                          setSymbol("");
+                          setShowSuggestions(false);
+                          inputRef.current?.focus();
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+
+                    {/* Suggestions Dropdown */}
+                    {showSuggestions && suggestions.length > 0 && (
+                      <div
+                        ref={suggestionsRef}
+                        className="absolute top-full left-0 right-0 mt-1 bg-popover border border-border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto"
+                      >
+                        {suggestions.map((stock) => (
+                          <button
+                            key={stock.symbol}
+                            onClick={() => handleSuggestionClick(stock.symbol)}
+                            className="w-full px-3 py-2 text-left hover:bg-accent hover:text-accent-foreground flex items-center justify-between group"
+                          >
+                            <div>
+                              <div className="font-medium">{stock.symbol}</div>
+                              <div className="text-xs text-muted-foreground">{stock.name}</div>
+                            </div>
+                            <Badge variant="outline" className="text-xs">
+                              {stock.market}
+                            </Badge>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    onClick={handlePredict}
+                    disabled={loading || !symbol.trim()}
+                    size="icon"
+                    className="shrink-0"
+                  >
+                    {loading ? (
+                      <div className="animate-spin h-4 w-4 border-2 border-background border-t-transparent rounded-full" />
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </div>
+
+              {/* Recent Searches */}
+              {recentSearches.length > 0 && !showSuggestions && (
+                <div className="mb-4">
+                  <p className="text-xs text-muted-foreground mb-2">Recent searches:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {recentSearches.map((search) => (
+                      <button
+                        key={search}
+                        onClick={() => {
+                          setSymbol(search);
+                          inputRef.current?.focus();
+                        }}
+                        className="px-2 py-1 text-xs bg-muted hover:bg-muted/80 rounded-md transition-colors"
+                      >
+                        {search}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Error Display */}
               {error && (
-                <p className="text-destructive text-sm">{error}</p>
+                <Alert className="border-destructive/50">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription className="flex items-center justify-between">
+                    <span>{error}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearError}
+                      className="h-auto p-1 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </AlertDescription>
+                </Alert>
               )}
             </CardContent>
           </Card>
