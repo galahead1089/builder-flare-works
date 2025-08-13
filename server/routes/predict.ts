@@ -262,9 +262,6 @@ export const handlePredict: RequestHandler = async (req, res) => {
     const features = analyzeStock(stockData);
     const { prediction, confidence } = makePrediction(stockData, timeframe);
 
-    // Get GROWW specific recommendations
-    const growwRecommendation = getGrowwRecommendation(stockSymbol, prediction);
-
     // Simulate model accuracy (in real app, this would be calculated from backtesting)
     let accuracy = 75 + Math.random() * 15; // 75-90% range
 
@@ -279,8 +276,7 @@ export const handlePredict: RequestHandler = async (req, res) => {
       confidence,
       accuracy: Math.round(accuracy * 100) / 100,
       timeframe,
-      features,
-      growwRecommendation
+      features
     };
 
     res.json(response);
