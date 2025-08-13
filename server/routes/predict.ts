@@ -266,18 +266,27 @@ function makePrediction(stockData: StockData[], timeframe: "today" | "tomorrow")
   
   // Calculate confidence based on signal strength
   const maxPossibleScore = signals * 2;
-  const confidence = Math.min(Math.abs(score) / maxPossibleScore, 1);
-  
+  let confidence = Math.min(Math.abs(score) / maxPossibleScore, 1);
+
+  // Adjust confidence based on timeframe
+  if (timeframe === "today") {
+    // Today's predictions are less reliable due to short timeframe
+    confidence *= 0.8;
+    score *= 0.9; // Reduce signal strength for today
+  }
+
   // Make prediction
   let prediction: "BUY" | "SELL" | "HOLD";
-  if (score > 1 && confidence > 0.6) {
+  const confidenceThreshold = timeframe === "today" ? 0.5 : 0.6;
+
+  if (score > 1 && confidence > confidenceThreshold) {
     prediction = "BUY";
-  } else if (score < -1 && confidence > 0.6) {
+  } else if (score < -1 && confidence > confidenceThreshold) {
     prediction = "SELL";
   } else {
     prediction = "HOLD";
   }
-  
+
   return {
     prediction,
     confidence: Math.round(confidence * 100)
