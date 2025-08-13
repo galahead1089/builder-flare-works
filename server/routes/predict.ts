@@ -22,11 +22,6 @@ interface PredictionResponse {
     volatility: string;
     volume_trend: string;
   };
-  growwRecommendation?: {
-    canBuy: boolean;
-    steps: string[];
-    notes: string[];
-  };
 }
 
 // Calculate RSI
