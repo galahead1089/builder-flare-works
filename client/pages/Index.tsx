@@ -363,19 +363,42 @@ export default function Index() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Confidence Score */}
-                  <div className="text-center">
-                    <div className={cn("text-4xl font-bold mb-2", getConfidenceColor(prediction.confidence))}>
-                      {prediction.confidence}%
+                  <div className="text-center group">
+                    <div className={cn(
+                      "text-4xl font-bold mb-2 transition-all duration-500 animate-in zoom-in-75 delay-300",
+                      "group-hover:scale-110 transform",
+                      getConfidenceColor(prediction.confidence)
+                    )}>
+                      <CountUpAnimation value={prediction.confidence} />%
                     </div>
-                    <p className="text-muted-foreground">Confidence Level</p>
+                    <p className="text-muted-foreground animate-in fade-in delay-500">Confidence Level</p>
+                    <div className={cn(
+                      "mt-2 h-2 bg-muted rounded-full overflow-hidden",
+                      "animate-in slide-in-from-left delay-700"
+                    )}>
+                      <div
+                        className={cn(
+                          "h-full transition-all duration-1000 ease-out",
+                          prediction.confidence >= 80 ? "bg-success" :
+                          prediction.confidence >= 60 ? "bg-warning" : "bg-destructive"
+                        )}
+                        style={{ width: `${prediction.confidence}%` }}
+                      />
+                    </div>
                   </div>
 
                   {/* Model Accuracy */}
-                  <div className="text-center">
-                    <div className="text-4xl font-bold mb-2 text-chart-1">
-                      {prediction.accuracy}%
+                  <div className="text-center group">
+                    <div className="text-4xl font-bold mb-2 text-chart-1 transition-all duration-500 animate-in zoom-in-75 delay-400 group-hover:scale-110 transform">
+                      <CountUpAnimation value={prediction.accuracy} />%
                     </div>
-                    <p className="text-muted-foreground">Model Accuracy</p>
+                    <p className="text-muted-foreground animate-in fade-in delay-600">Model Accuracy</p>
+                    <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden animate-in slide-in-from-right delay-800">
+                      <div
+                        className="h-full bg-chart-1 transition-all duration-1000 ease-out"
+                        style={{ width: `${prediction.accuracy}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>
