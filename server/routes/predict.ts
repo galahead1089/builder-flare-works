@@ -1,6 +1,28 @@
 import { RequestHandler } from "express";
 import fetch from "node-fetch";
 
+// Simple in-memory cache
+const cache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+function getCachedData(key: string) {
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.data;
+  }
+  return null;
+}
+
+function setCachedData(key: string, data: any) {
+  cache.set(key, { data, timestamp: Date.now() });
+
+  // Clean up old cache entries
+  if (cache.size > 100) {
+    const oldestKey = Array.from(cache.keys())[0];
+    cache.delete(oldestKey);
+  }
+}
+
 interface StockData {
   date: string;
   open: number;
