@@ -104,6 +104,21 @@ export default function Index() {
 
       const result = await response.json();
       setPrediction(result);
+
+      // Save to history
+      const historyItem = {
+        id: Date.now().toString(),
+        symbol: result.symbol,
+        prediction: result.prediction,
+        confidence: result.confidence,
+        timeframe: result.timeframe,
+        timestamp: Date.now()
+      };
+
+      const savedHistory = localStorage.getItem('predictionHistory');
+      const history = savedHistory ? JSON.parse(savedHistory) : [];
+      const updatedHistory = [historyItem, ...history].slice(0, 20); // Keep last 20
+      localStorage.setItem('predictionHistory', JSON.stringify(updatedHistory));
     } catch (err) {
       if (err instanceof Error) {
         if (err.name === 'AbortError') {
