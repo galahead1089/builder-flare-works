@@ -347,6 +347,9 @@ export default function Index() {
           </Card>
         </div>
 
+        {/* Prediction History */}
+        <PredictionHistory />
+
         {/* Loading State */}
         {loading && <PredictionSkeleton />}
 
