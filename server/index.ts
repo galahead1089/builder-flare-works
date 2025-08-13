@@ -20,5 +20,7 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  app.post("/api/predict", handlePredict);
+
   return app;
 }
