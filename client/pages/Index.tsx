@@ -206,6 +206,59 @@ export default function Index() {
               </CardContent>
             </Card>
 
+            {/* GROWW App Recommendations */}
+            {prediction.growwRecommendation && (
+              <Card className={cn("border-2", prediction.growwRecommendation.canBuy ? "border-success/50" : "border-warning/50")}>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Smartphone className="h-5 w-5" />
+                    <span>GROWW App Recommendation</span>
+                    {prediction.growwRecommendation.canBuy ? (
+                      <CheckCircle className="h-5 w-5 text-success" />
+                    ) : (
+                      <AlertCircle className="h-5 w-5 text-warning" />
+                    )}
+                  </CardTitle>
+                  <CardDescription>
+                    {prediction.growwRecommendation.canBuy
+                      ? "Ready to buy on GROWW app"
+                      : "Not recommended for purchase"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {prediction.growwRecommendation.canBuy && prediction.growwRecommendation.steps.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="font-semibold mb-3 text-success">How to buy on GROWW:</h4>
+                      <ol className="space-y-2">
+                        {prediction.growwRecommendation.steps.map((step, index) => (
+                          <li key={index} className="flex items-start space-x-3">
+                            <span className="flex items-center justify-center w-6 h-6 bg-primary text-primary-foreground rounded-full text-xs font-medium">
+                              {index + 1}
+                            </span>
+                            <span className="text-sm">{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+
+                  {prediction.growwRecommendation.notes.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold mb-3">Important Notes:</h4>
+                      <ul className="space-y-2">
+                        {prediction.growwRecommendation.notes.map((note, index) => (
+                          <li key={index} className="flex items-start space-x-2">
+                            <span className="text-warning">•</span>
+                            <span className="text-sm text-muted-foreground">{note}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Technical Analysis Details */}
             <Card>
               <CardHeader>
