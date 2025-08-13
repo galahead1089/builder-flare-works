@@ -181,7 +181,9 @@ export default function Index() {
                     <span>{prediction.prediction}</span>
                   </span>
                 </CardTitle>
-                <CardDescription>Tomorrow's Trading Recommendation</CardDescription>
+                <CardDescription>
+                  {prediction.timeframe === "today" ? "Today's" : "Tomorrow's"} Trading Recommendation
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
