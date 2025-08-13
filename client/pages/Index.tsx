@@ -450,53 +450,55 @@ export default function Index() {
 
         {/* Features Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Brain className="h-6 w-6 text-primary" />
+          {[
+            {
+              icon: Brain,
+              iconBg: "bg-primary/10",
+              iconColor: "text-primary",
+              title: "AI-Powered Analysis",
+              description: "Advanced machine learning algorithms analyze multiple technical indicators including RSI, MACD, and Bollinger Bands.",
+              delay: "delay-100"
+            },
+            {
+              icon: Target,
+              iconBg: "bg-chart-1/10",
+              iconColor: "text-chart-1",
+              title: "High Accuracy",
+              description: "Our models achieve 75-90% accuracy through comprehensive backtesting and continuous learning from market data.",
+              delay: "delay-200"
+            },
+            {
+              icon: Zap,
+              iconBg: "bg-chart-2/10",
+              iconColor: "text-chart-2",
+              title: "Real-Time Predictions",
+              description: "Get instant trading recommendations for any stock symbol with confidence scores and detailed technical analysis.",
+              delay: "delay-300"
+            }
+          ].map((feature, index) => (
+            <Card
+              key={feature.title}
+              className={cn(
+                "transition-all duration-300 hover:shadow-lg hover:scale-105 transform",
+                "animate-in slide-in-from-bottom-4",
+                feature.delay
+              )}
+            >
+              <CardHeader>
+                <div className="flex items-center space-x-2">
+                  <div className={cn("p-2 rounded-lg transition-all duration-300 hover:scale-110", feature.iconBg)}>
+                    <feature.icon className={cn("h-6 w-6", feature.iconColor)} />
+                  </div>
+                  <CardTitle className="text-lg">{feature.title}</CardTitle>
                 </div>
-                <CardTitle className="text-lg">AI-Powered Analysis</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Advanced machine learning algorithms analyze multiple technical indicators including RSI, MACD, and Bollinger Bands.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-chart-1/10 rounded-lg">
-                  <Target className="h-6 w-6 text-chart-1" />
-                </div>
-                <CardTitle className="text-lg">High Accuracy</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Our models achieve 75-90% accuracy through comprehensive backtesting and continuous learning from market data.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-chart-2/10 rounded-lg">
-                  <Zap className="h-6 w-6 text-chart-2" />
-                </div>
-                <CardTitle className="text-lg">Real-Time Predictions</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Get instant trading recommendations for any stock symbol with confidence scores and detailed technical analysis.
-              </p>
-            </CardContent>
-          </Card>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  {feature.description}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Disclaimer */}
