@@ -330,8 +330,11 @@ export default function Index() {
           </Card>
         </div>
 
+        {/* Loading State */}
+        {loading && <PredictionSkeleton />}
+
         {/* Prediction Results */}
-        {prediction && (
+        {prediction && !loading && (
           <div className="space-y-6 mb-12">
             {/* Main Prediction Card */}
             <Card className="border-2">
