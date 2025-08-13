@@ -128,17 +128,27 @@ export default function Index() {
           </p>
 
           {/* Search Interface */}
-          <Card className="max-w-md mx-auto mb-8">
+          <Card className="max-w-lg mx-auto mb-8">
             <CardContent className="p-6">
+              {/* Timeframe Selection */}
+              <div className="mb-4">
+                <Tabs value={timeframe} onValueChange={(value) => setTimeframe(value as "today" | "tomorrow")}>
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="today">Today's Prediction</TabsTrigger>
+                    <TabsTrigger value="tomorrow">Tomorrow's Prediction</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+
               <div className="flex space-x-2 mb-4">
                 <Input
-                  placeholder="Enter stock symbol (e.g., AAPL, TSLA, NVDA)"
+                  placeholder="Enter stock symbol (e.g., AAPL, RELIANCE, TCS)"
                   value={symbol}
                   onChange={(e) => setSymbol(e.target.value.toUpperCase())}
                   onKeyPress={handleKeyPress}
                   className="flex-1"
                 />
-                <Button 
+                <Button
                   onClick={handlePredict}
                   disabled={loading}
                   size="icon"
