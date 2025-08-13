@@ -49,17 +49,19 @@ interface PredictionResponse {
 // Calculate RSI
 function calculateRSI(prices: number[], period: number = 14): number {
   if (prices.length < period + 1) return 50;
-  
+
   const changes = prices.slice(1).map((price, i) => price - prices[i]);
-  const gains = changes.map(change => change > 0 ? change : 0);
-  const losses = changes.map(change => change < 0 ? -change : 0);
-  
-  const avgGain = gains.slice(-period).reduce((sum, gain) => sum + gain, 0) / period;
-  const avgLoss = losses.slice(-period).reduce((sum, loss) => sum + loss, 0) / period;
-  
+  const gains = changes.map((change) => (change > 0 ? change : 0));
+  const losses = changes.map((change) => (change < 0 ? -change : 0));
+
+  const avgGain =
+    gains.slice(-period).reduce((sum, gain) => sum + gain, 0) / period;
+  const avgLoss =
+    losses.slice(-period).reduce((sum, loss) => sum + loss, 0) / period;
+
   if (avgLoss === 0) return 100;
   const rs = avgGain / avgLoss;
-  return 100 - (100 / (1 + rs));
+  return 100 - 100 / (1 + rs);
 }
 
 // Calculate Simple Moving Average
@@ -73,13 +75,14 @@ function calculateSMA(prices: number[], period: number): number {
 function calculateBollingerBands(prices: number[], period: number = 20) {
   const sma = calculateSMA(prices, period);
   const recent = prices.slice(-period);
-  const variance = recent.reduce((sum, price) => sum + Math.pow(price - sma, 2), 0) / period;
+  const variance =
+    recent.reduce((sum, price) => sum + Math.pow(price - sma, 2), 0) / period;
   const stdDev = Math.sqrt(variance);
-  
+
   return {
-    upper: sma + (2 * stdDev),
+    upper: sma + 2 * stdDev,
     middle: sma,
-    lower: sma - (2 * stdDev)
+    lower: sma - 2 * stdDev,
   };
 }
 
@@ -106,7 +109,7 @@ async function fetchStockData(symbol: string): Promise<StockData[]> {
     const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${API_KEY}`;
 
     const response = await fetch(url, { timeout: 10000 });
-    const data = await response.json() as any;
+    const data = (await response.json()) as any;
 
     if (data["Error Message"] || data["Note"]) {
       // Fallback to demo data for popular stocks
@@ -130,7 +133,7 @@ async function fetchStockData(symbol: string): Promise<StockData[]> {
         high: parseFloat(values["2. high"]),
         low: parseFloat(values["3. low"]),
         close: parseFloat(values["4. close"]),
-        volume: parseInt(values["5. volume"])
+        volume: parseInt(values["5. volume"]),
       }))
       .reverse(); // Oldest first
 
@@ -147,11 +150,28 @@ async function fetchStockData(symbol: string): Promise<StockData[]> {
 
 // Popular stock base prices for more realistic demo data
 const STOCK_BASE_PRICES: Record<string, number> = {
-  'AAPL': 175, 'MSFT': 350, 'GOOGL': 140, 'AMZN': 155, 'TSLA': 250,
-  'NVDA': 800, 'META': 350, 'NFLX': 450, 'BABA': 90, 'V': 270,
-  'RELIANCE': 2800, 'TCS': 3500, 'HDFCBANK': 1600, 'INFY': 1800,
-  'HINDUNILVR': 2400, 'ITC': 450, 'SBIN': 750, 'BHARTIARTL': 1200,
-  'KOTAKBANK': 1800, 'LT': 3200, 'ASIANPAINT': 3000, 'MARUTI': 11000
+  AAPL: 175,
+  MSFT: 350,
+  GOOGL: 140,
+  AMZN: 155,
+  TSLA: 250,
+  NVDA: 800,
+  META: 350,
+  NFLX: 450,
+  BABA: 90,
+  V: 270,
+  RELIANCE: 2800,
+  TCS: 3500,
+  HDFCBANK: 1600,
+  INFY: 1800,
+  HINDUNILVR: 2400,
+  ITC: 450,
+  SBIN: 750,
+  BHARTIARTL: 1200,
+  KOTAKBANK: 1800,
+  LT: 3200,
+  ASIANPAINT: 3000,
+  MARUTI: 11000,
 };
 
 // Generate realistic demo data for testing
@@ -160,19 +180,22 @@ function generateDemoData(symbol: string): StockData[] {
   let basePrice = STOCK_BASE_PRICES[symbol] || 150;
 
   // Add some randomness to the base price
-  basePrice *= (0.9 + Math.random() * 0.2);
+  basePrice *= 0.9 + Math.random() * 0.2;
 
   for (let i = 0; i < 100; i++) {
     // More realistic volatility based on stock type
-    const volatility = symbol.includes('CRYPTO') ? 0.05 :
-                      symbol.startsWith('TESLA') || symbol.startsWith('NVDA') ? 0.03 : 0.02;
+    const volatility = symbol.includes("CRYPTO")
+      ? 0.05
+      : symbol.startsWith("TESLA") || symbol.startsWith("NVDA")
+        ? 0.03
+        : 0.02;
 
     // Market cycles and trends
     const longTrend = Math.sin(i * 0.05) * 0.003; // Long-term cycle
     const shortTrend = Math.sin(i * 0.2) * 0.001; // Short-term fluctuation
     const randomWalk = (Math.random() - 0.5) * volatility;
 
-    basePrice *= (1 + longTrend + shortTrend + randomWalk);
+    basePrice *= 1 + longTrend + shortTrend + randomWalk;
 
     // Ensure price stays positive
     basePrice = Math.max(basePrice, 1);
@@ -180,22 +203,31 @@ function generateDemoData(symbol: string): StockData[] {
     const dailyVolatility = 0.005;
     const open = basePrice * (1 + (Math.random() - 0.5) * dailyVolatility);
     const close = basePrice * (1 + (Math.random() - 0.5) * dailyVolatility);
-    const high = Math.max(open, close) * (1 + Math.random() * dailyVolatility * 2);
-    const low = Math.min(open, close) * (1 - Math.random() * dailyVolatility * 2);
+    const high =
+      Math.max(open, close) * (1 + Math.random() * dailyVolatility * 2);
+    const low =
+      Math.min(open, close) * (1 - Math.random() * dailyVolatility * 2);
 
     // Volume varies with price movements
     const priceChange = Math.abs(close - open) / open;
-    const baseVolume = symbol.startsWith('RELIANCE') ? 5000000 :
-                      symbol.startsWith('AAPL') ? 50000000 : 2000000;
-    const volume = Math.floor(baseVolume * (1 + priceChange * 5) * (0.5 + Math.random()));
+    const baseVolume = symbol.startsWith("RELIANCE")
+      ? 5000000
+      : symbol.startsWith("AAPL")
+        ? 50000000
+        : 2000000;
+    const volume = Math.floor(
+      baseVolume * (1 + priceChange * 5) * (0.5 + Math.random()),
+    );
 
     data.push({
-      date: new Date(Date.now() - (99 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      date: new Date(Date.now() - (99 - i) * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0],
       open: Number(open.toFixed(2)),
       high: Number(high.toFixed(2)),
       low: Number(low.toFixed(2)),
       close: Number(close.toFixed(2)),
-      volume
+      volume,
     });
   }
 
@@ -203,45 +235,48 @@ function generateDemoData(symbol: string): StockData[] {
 }
 
 function analyzeStock(stockData: StockData[]): PredictionResponse["features"] {
-  const closes = stockData.map(d => d.close);
-  const volumes = stockData.map(d => d.volume);
-  
+  const closes = stockData.map((d) => d.close);
+  const volumes = stockData.map((d) => d.volume);
+
   // Calculate RSI
   const rsi = calculateRSI(closes);
-  
+
   // Calculate trend using moving averages
   const sma10 = calculateSMA(closes, 10);
   const sma50 = calculateSMA(closes, 50);
   const trend = sma10 > sma50 ? "BULLISH" : "BEARISH";
-  
+
   // Calculate volatility using Bollinger Bands
   const bb = calculateBollingerBands(closes);
   const currentPrice = closes[closes.length - 1];
   let volatility = "NORMAL";
-  
+
   if (currentPrice > bb.upper) volatility = "HIGH";
   else if (currentPrice < bb.lower) volatility = "LOW";
-  
+
   // Volume trend
   const recentVolume = calculateSMA(volumes, 5);
   const olderVolume = calculateSMA(volumes.slice(-20, -5), 15);
   const volume_trend = recentVolume > olderVolume ? "INCREASING" : "DECREASING";
-  
+
   return {
     rsi: Math.round(rsi * 100) / 100,
     trend,
     volatility,
-    volume_trend
+    volume_trend,
   };
 }
 
-function makePrediction(stockData: StockData[], timeframe: "today" | "tomorrow"): { prediction: "BUY" | "SELL" | "HOLD", confidence: number } {
+function makePrediction(
+  stockData: StockData[],
+  timeframe: "today" | "tomorrow",
+): { prediction: "BUY" | "SELL" | "HOLD"; confidence: number } {
   const features = analyzeStock(stockData);
-  const closes = stockData.map(d => d.close);
-  
+  const closes = stockData.map((d) => d.close);
+
   let score = 0;
   let signals = 0;
-  
+
   // RSI signals
   if (features.rsi < 30) {
     score += 2; // Strong buy signal
@@ -256,7 +291,7 @@ function makePrediction(stockData: StockData[], timeframe: "today" | "tomorrow")
     score -= 1; // Weak sell signal
     signals++;
   }
-  
+
   // Trend signals
   if (features.trend === "BULLISH") {
     score += 1;
@@ -265,21 +300,24 @@ function makePrediction(stockData: StockData[], timeframe: "today" | "tomorrow")
     score -= 1;
     signals++;
   }
-  
+
   // Volume signals
   if (features.volume_trend === "INCREASING" && features.trend === "BULLISH") {
     score += 1;
     signals++;
-  } else if (features.volume_trend === "INCREASING" && features.trend === "BEARISH") {
+  } else if (
+    features.volume_trend === "INCREASING" &&
+    features.trend === "BEARISH"
+  ) {
     score -= 1;
     signals++;
   }
-  
+
   // Volatility consideration
   if (features.volatility === "HIGH") {
     score *= 0.8; // Reduce confidence in high volatility
   }
-  
+
   // Calculate confidence based on signal strength
   const maxPossibleScore = signals * 2;
   let confidence = Math.min(Math.abs(score) / maxPossibleScore, 1);
@@ -305,7 +343,7 @@ function makePrediction(stockData: StockData[], timeframe: "today" | "tomorrow")
 
   return {
     prediction,
-    confidence: Math.round(confidence * 100)
+    confidence: Math.round(confidence * 100),
   };
 }
 
@@ -318,7 +356,9 @@ export const handlePredict: RequestHandler = async (req, res) => {
     }
 
     if (!["today", "tomorrow"].includes(timeframe)) {
-      return res.status(400).json({ error: "Timeframe must be 'today' or 'tomorrow'" });
+      return res
+        .status(400)
+        .json({ error: "Timeframe must be 'today' or 'tomorrow'" });
     }
 
     const stockSymbol = symbol.toUpperCase();
@@ -348,7 +388,7 @@ export const handlePredict: RequestHandler = async (req, res) => {
       confidence,
       accuracy: Math.round(accuracy * 100) / 100,
       timeframe,
-      features
+      features,
     };
 
     res.json(response);

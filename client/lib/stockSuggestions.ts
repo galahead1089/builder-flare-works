@@ -10,7 +10,7 @@ export const POPULAR_STOCKS = [
   { symbol: "NFLX", name: "Netflix Inc.", market: "US" },
   { symbol: "BABA", name: "Alibaba Group", market: "US" },
   { symbol: "V", name: "Visa Inc.", market: "US" },
-  
+
   // Indian Stocks
   { symbol: "RELIANCE", name: "Reliance Industries Ltd.", market: "IN" },
   { symbol: "TCS", name: "Tata Consultancy Services", market: "IN" },
@@ -31,17 +31,16 @@ export const POPULAR_STOCKS = [
   { symbol: "TITAN", name: "Titan Company Ltd.", market: "IN" },
   { symbol: "BAJFINANCE", name: "Bajaj Finance Ltd.", market: "IN" },
   { symbol: "NESTLEIND", name: "Nestle India Ltd.", market: "IN" },
-  { symbol: "WIPRO", name: "Wipro Ltd.", market: "IN" }
+  { symbol: "WIPRO", name: "Wipro Ltd.", market: "IN" },
 ];
 
 export function searchStocks(query: string) {
   if (!query.trim()) return [];
-  
+
   const searchTerm = query.toLowerCase();
-  return POPULAR_STOCKS
-    .filter(stock => 
+  return POPULAR_STOCKS.filter(
+    (stock) =>
       stock.symbol.toLowerCase().includes(searchTerm) ||
-      stock.name.toLowerCase().includes(searchTerm)
-    )
-    .slice(0, 8); // Limit to 8 suggestions
+      stock.name.toLowerCase().includes(searchTerm),
+  ).slice(0, 8); // Limit to 8 suggestions
 }

@@ -1,8 +1,27 @@
 import { useState, useRef, useEffect } from "react";
-import { TrendingUp, TrendingDown, Minus, Search, Target, Zap, BarChart3, Brain, Activity, X, Clock, AlertTriangle } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  Search,
+  Target,
+  Zap,
+  BarChart3,
+  Brain,
+  Activity,
+  X,
+  Clock,
+  AlertTriangle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -40,7 +59,7 @@ export default function Index() {
 
   // Load recent searches from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('recentStockSearches');
+    const saved = localStorage.getItem("recentStockSearches");
     if (saved) {
       try {
         setRecentSearches(JSON.parse(saved));
@@ -53,14 +72,18 @@ export default function Index() {
   // Handle clicks outside suggestions
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node) &&
-          inputRef.current && !inputRef.current.contains(event.target as Node)) {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
         setShowSuggestions(false);
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handlePredict = async () => {
@@ -75,9 +98,15 @@ export default function Index() {
     setShowSuggestions(false);
 
     // Add to recent searches
-    const newRecentSearches = [trimmedSymbol, ...recentSearches.filter(s => s !== trimmedSymbol)].slice(0, 5);
+    const newRecentSearches = [
+      trimmedSymbol,
+      ...recentSearches.filter((s) => s !== trimmedSymbol),
+    ].slice(0, 5);
     setRecentSearches(newRecentSearches);
-    localStorage.setItem('recentStockSearches', JSON.stringify(newRecentSearches));
+    localStorage.setItem(
+      "recentStockSearches",
+      JSON.stringify(newRecentSearches),
+    );
 
     try {
       const controller = new AbortController();
@@ -90,9 +119,9 @@ export default function Index() {
         },
         body: JSON.stringify({
           symbol: trimmedSymbol,
-          timeframe
+          timeframe,
         }),
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
@@ -112,16 +141,16 @@ export default function Index() {
         prediction: result.prediction,
         confidence: result.confidence,
         timeframe: result.timeframe,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
-      const savedHistory = localStorage.getItem('predictionHistory');
+      const savedHistory = localStorage.getItem("predictionHistory");
       const history = savedHistory ? JSON.parse(savedHistory) : [];
       const updatedHistory = [historyItem, ...history].slice(0, 20); // Keep last 20
-      localStorage.setItem('predictionHistory', JSON.stringify(updatedHistory));
+      localStorage.setItem("predictionHistory", JSON.stringify(updatedHistory));
     } catch (err) {
       if (err instanceof Error) {
-        if (err.name === 'AbortError') {
+        if (err.name === "AbortError") {
           setError("Request timed out. Please try again.");
         } else {
           setError(err.message);
@@ -167,17 +196,23 @@ export default function Index() {
 
   const getPredictionColor = (pred: string) => {
     switch (pred) {
-      case "BUY": return "text-success";
-      case "SELL": return "text-destructive";
-      default: return "text-warning";
+      case "BUY":
+        return "text-success";
+      case "SELL":
+        return "text-destructive";
+      default:
+        return "text-warning";
     }
   };
 
   const getPredictionIcon = (pred: string) => {
     switch (pred) {
-      case "BUY": return <TrendingUp className="h-5 w-5" />;
-      case "SELL": return <TrendingDown className="h-5 w-5" />;
-      default: return <Minus className="h-5 w-5" />;
+      case "BUY":
+        return <TrendingUp className="h-5 w-5" />;
+      case "SELL":
+        return <TrendingDown className="h-5 w-5" />;
+      default:
+        return <Minus className="h-5 w-5" />;
     }
   };
 
@@ -214,8 +249,9 @@ export default function Index() {
             AI-Powered Stock Prediction
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Get tomorrow's trading signals with advanced machine learning analysis. 
-            Enter any stock symbol and receive instant buy/sell recommendations.
+            Get tomorrow's trading signals with advanced machine learning
+            analysis. Enter any stock symbol and receive instant buy/sell
+            recommendations.
           </p>
 
           {/* Search Interface */}
@@ -223,9 +259,17 @@ export default function Index() {
             <CardContent className="p-6">
               {/* Timeframe Selection */}
               <div className="mb-4">
-                <Tabs value={timeframe} onValueChange={(value) => setTimeframe(value as "today" | "tomorrow")}>
+                <Tabs
+                  value={timeframe}
+                  onValueChange={(value) =>
+                    setTimeframe(value as "today" | "tomorrow")
+                  }
+                >
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="today" className="flex items-center space-x-2">
+                    <TabsTrigger
+                      value="today"
+                      className="flex items-center space-x-2"
+                    >
                       <Clock className="h-4 w-4" />
                       <span>Today</span>
                     </TabsTrigger>
@@ -280,7 +324,9 @@ export default function Index() {
                           >
                             <div>
                               <div className="font-medium">{stock.symbol}</div>
-                              <div className="text-xs text-muted-foreground">{stock.name}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {stock.name}
+                              </div>
                             </div>
                             <Badge variant="outline" className="text-xs">
                               {stock.market}
@@ -308,7 +354,9 @@ export default function Index() {
               {/* Recent Searches */}
               {recentSearches.length > 0 && !showSuggestions && (
                 <div className="mb-4">
-                  <p className="text-xs text-muted-foreground mb-2">Recent searches:</p>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Recent searches:
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     {recentSearches.map((search) => (
                       <button
@@ -357,19 +405,27 @@ export default function Index() {
         {prediction && !loading && (
           <div className="space-y-6 mb-12">
             {/* Main Prediction Card */}
-            <Card className={cn(
-              "border-2 transition-all duration-500 animate-in slide-in-from-bottom-4",
-              prediction.prediction === "BUY" ? "border-success/50 bg-success/5" :
-              prediction.prediction === "SELL" ? "border-destructive/50 bg-destructive/5" :
-              "border-warning/50 bg-warning/5"
-            )}>
+            <Card
+              className={cn(
+                "border-2 transition-all duration-500 animate-in slide-in-from-bottom-4",
+                prediction.prediction === "BUY"
+                  ? "border-success/50 bg-success/5"
+                  : prediction.prediction === "SELL"
+                    ? "border-destructive/50 bg-destructive/5"
+                    : "border-warning/50 bg-warning/5",
+              )}
+            >
               <CardHeader className="text-center">
                 <CardTitle className="flex items-center justify-center space-x-2 text-2xl animate-in fade-in duration-700">
-                  <span className="font-mono tracking-wider">{prediction.symbol}</span>
-                  <span className={cn(
-                    "flex items-center space-x-1 transition-all duration-300 animate-in zoom-in-50",
-                    getPredictionColor(prediction.prediction)
-                  )}>
+                  <span className="font-mono tracking-wider">
+                    {prediction.symbol}
+                  </span>
+                  <span
+                    className={cn(
+                      "flex items-center space-x-1 transition-all duration-300 animate-in zoom-in-50",
+                      getPredictionColor(prediction.prediction),
+                    )}
+                  >
                     <span className="animate-pulse">
                       {getPredictionIcon(prediction.prediction)}
                     </span>
@@ -377,30 +433,40 @@ export default function Index() {
                   </span>
                 </CardTitle>
                 <CardDescription className="animate-in fade-in duration-500 delay-200">
-                  {prediction.timeframe === "today" ? "Today's" : "Tomorrow's"} Trading Recommendation
+                  {prediction.timeframe === "today" ? "Today's" : "Tomorrow's"}{" "}
+                  Trading Recommendation
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Confidence Score */}
                   <div className="text-center group">
-                    <div className={cn(
-                      "text-4xl font-bold mb-2 transition-all duration-500 animate-in zoom-in-75 delay-300",
-                      "group-hover:scale-110 transform",
-                      getConfidenceColor(prediction.confidence)
-                    )}>
+                    <div
+                      className={cn(
+                        "text-4xl font-bold mb-2 transition-all duration-500 animate-in zoom-in-75 delay-300",
+                        "group-hover:scale-110 transform",
+                        getConfidenceColor(prediction.confidence),
+                      )}
+                    >
                       <CountUpAnimation value={prediction.confidence} />%
                     </div>
-                    <p className="text-muted-foreground animate-in fade-in delay-500">Confidence Level</p>
-                    <div className={cn(
-                      "mt-2 h-2 bg-muted rounded-full overflow-hidden",
-                      "animate-in slide-in-from-left delay-700"
-                    )}>
+                    <p className="text-muted-foreground animate-in fade-in delay-500">
+                      Confidence Level
+                    </p>
+                    <div
+                      className={cn(
+                        "mt-2 h-2 bg-muted rounded-full overflow-hidden",
+                        "animate-in slide-in-from-left delay-700",
+                      )}
+                    >
                       <div
                         className={cn(
                           "h-full transition-all duration-1000 ease-out",
-                          prediction.confidence >= 80 ? "bg-success" :
-                          prediction.confidence >= 60 ? "bg-warning" : "bg-destructive"
+                          prediction.confidence >= 80
+                            ? "bg-success"
+                            : prediction.confidence >= 60
+                              ? "bg-warning"
+                              : "bg-destructive",
                         )}
                         style={{ width: `${prediction.confidence}%` }}
                       />
@@ -412,7 +478,9 @@ export default function Index() {
                     <div className="text-4xl font-bold mb-2 text-chart-1 transition-all duration-500 animate-in zoom-in-75 delay-400 group-hover:scale-110 transform">
                       <CountUpAnimation value={prediction.accuracy} />%
                     </div>
-                    <p className="text-muted-foreground animate-in fade-in delay-600">Model Accuracy</p>
+                    <p className="text-muted-foreground animate-in fade-in delay-600">
+                      Model Accuracy
+                    </p>
                     <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden animate-in slide-in-from-right delay-800">
                       <div
                         className="h-full bg-chart-1 transition-all duration-1000 ease-out"
@@ -438,10 +506,26 @@ export default function Index() {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
-                    { label: "RSI", value: prediction.features.rsi, delay: "delay-700" },
-                    { label: "Trend", value: prediction.features.trend, delay: "delay-[800ms]" },
-                    { label: "Volatility", value: prediction.features.volatility, delay: "delay-[900ms]" },
-                    { label: "Volume", value: prediction.features.volume_trend, delay: "delay-[1000ms]" }
+                    {
+                      label: "RSI",
+                      value: prediction.features.rsi,
+                      delay: "delay-700",
+                    },
+                    {
+                      label: "Trend",
+                      value: prediction.features.trend,
+                      delay: "delay-[800ms]",
+                    },
+                    {
+                      label: "Volatility",
+                      value: prediction.features.volatility,
+                      delay: "delay-[900ms]",
+                    },
+                    {
+                      label: "Volume",
+                      value: prediction.features.volume_trend,
+                      delay: "delay-[1000ms]",
+                    },
                   ].map((item, index) => (
                     <div
                       key={item.label}
@@ -449,16 +533,19 @@ export default function Index() {
                         "text-center p-4 rounded-lg bg-muted/50 transition-all duration-300",
                         "hover:bg-muted/70 hover:scale-105 transform",
                         "animate-in slide-in-from-bottom-2",
-                        item.delay
+                        item.delay,
                       )}
                     >
                       <div className="text-lg font-semibold mb-1">
-                        {typeof item.value === 'number' ?
-                          <CountUpAnimation value={item.value} duration={800} /> :
+                        {typeof item.value === "number" ? (
+                          <CountUpAnimation value={item.value} duration={800} />
+                        ) : (
                           item.value
-                        }
+                        )}
                       </div>
-                      <div className="text-sm text-muted-foreground">{item.label}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {item.label}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -475,46 +562,54 @@ export default function Index() {
               iconBg: "bg-primary/10",
               iconColor: "text-primary",
               title: "AI-Powered Analysis",
-              description: "Advanced machine learning algorithms analyze multiple technical indicators including RSI, MACD, and Bollinger Bands.",
-              delay: "delay-100"
+              description:
+                "Advanced machine learning algorithms analyze multiple technical indicators including RSI, MACD, and Bollinger Bands.",
+              delay: "delay-100",
             },
             {
               icon: Target,
               iconBg: "bg-chart-1/10",
               iconColor: "text-chart-1",
               title: "High Accuracy",
-              description: "Our models achieve 75-90% accuracy through comprehensive backtesting and continuous learning from market data.",
-              delay: "delay-200"
+              description:
+                "Our models achieve 75-90% accuracy through comprehensive backtesting and continuous learning from market data.",
+              delay: "delay-200",
             },
             {
               icon: Zap,
               iconBg: "bg-chart-2/10",
               iconColor: "text-chart-2",
               title: "Real-Time Predictions",
-              description: "Get instant trading recommendations for any stock symbol with confidence scores and detailed technical analysis.",
-              delay: "delay-300"
-            }
+              description:
+                "Get instant trading recommendations for any stock symbol with confidence scores and detailed technical analysis.",
+              delay: "delay-300",
+            },
           ].map((feature, index) => (
             <Card
               key={feature.title}
               className={cn(
                 "transition-all duration-300 hover:shadow-lg hover:scale-105 transform",
                 "animate-in slide-in-from-bottom-4",
-                feature.delay
+                feature.delay,
               )}
             >
               <CardHeader>
                 <div className="flex items-center space-x-2">
-                  <div className={cn("p-2 rounded-lg transition-all duration-300 hover:scale-110", feature.iconBg)}>
-                    <feature.icon className={cn("h-6 w-6", feature.iconColor)} />
+                  <div
+                    className={cn(
+                      "p-2 rounded-lg transition-all duration-300 hover:scale-110",
+                      feature.iconBg,
+                    )}
+                  >
+                    <feature.icon
+                      className={cn("h-6 w-6", feature.iconColor)}
+                    />
                   </div>
                   <CardTitle className="text-lg">{feature.title}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  {feature.description}
-                </p>
+                <p className="text-muted-foreground">{feature.description}</p>
               </CardContent>
             </Card>
           ))}
@@ -524,8 +619,11 @@ export default function Index() {
         <Card className="bg-muted/30">
           <CardContent className="p-6">
             <p className="text-sm text-muted-foreground text-center">
-              <strong>Disclaimer:</strong> This is for educational purposes only. Stock trading involves risk and predictions should not be considered as financial advice. 
-              Always conduct your own research and consider consulting with a financial advisor before making investment decisions.
+              <strong>Disclaimer:</strong> This is for educational purposes
+              only. Stock trading involves risk and predictions should not be
+              considered as financial advice. Always conduct your own research
+              and consider consulting with a financial advisor before making
+              investment decisions.
             </p>
           </CardContent>
         </Card>
