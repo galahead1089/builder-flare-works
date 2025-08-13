@@ -145,34 +145,60 @@ async function fetchStockData(symbol: string): Promise<StockData[]> {
   }
 }
 
+// Popular stock base prices for more realistic demo data
+const STOCK_BASE_PRICES: Record<string, number> = {
+  'AAPL': 175, 'MSFT': 350, 'GOOGL': 140, 'AMZN': 155, 'TSLA': 250,
+  'NVDA': 800, 'META': 350, 'NFLX': 450, 'BABA': 90, 'V': 270,
+  'RELIANCE': 2800, 'TCS': 3500, 'HDFCBANK': 1600, 'INFY': 1800,
+  'HINDUNILVR': 2400, 'ITC': 450, 'SBIN': 750, 'BHARTIARTL': 1200,
+  'KOTAKBANK': 1800, 'LT': 3200, 'ASIANPAINT': 3000, 'MARUTI': 11000
+};
+
 // Generate realistic demo data for testing
 function generateDemoData(symbol: string): StockData[] {
   const data: StockData[] = [];
-  let basePrice = 150; // Starting price
-  
+  let basePrice = STOCK_BASE_PRICES[symbol] || 150;
+
+  // Add some randomness to the base price
+  basePrice *= (0.9 + Math.random() * 0.2);
+
   for (let i = 0; i < 100; i++) {
-    const volatility = 0.02; // 2% daily volatility
-    const trend = Math.sin(i * 0.1) * 0.005; // Slight upward trend
-    const randomChange = (Math.random() - 0.5) * volatility;
-    
-    basePrice *= (1 + trend + randomChange);
-    
-    const open = basePrice * (1 + (Math.random() - 0.5) * 0.01);
-    const close = basePrice;
-    const high = Math.max(open, close) * (1 + Math.random() * 0.02);
-    const low = Math.min(open, close) * (1 - Math.random() * 0.02);
-    const volume = Math.floor(1000000 + Math.random() * 2000000);
-    
+    // More realistic volatility based on stock type
+    const volatility = symbol.includes('CRYPTO') ? 0.05 :
+                      symbol.startsWith('TESLA') || symbol.startsWith('NVDA') ? 0.03 : 0.02;
+
+    // Market cycles and trends
+    const longTrend = Math.sin(i * 0.05) * 0.003; // Long-term cycle
+    const shortTrend = Math.sin(i * 0.2) * 0.001; // Short-term fluctuation
+    const randomWalk = (Math.random() - 0.5) * volatility;
+
+    basePrice *= (1 + longTrend + shortTrend + randomWalk);
+
+    // Ensure price stays positive
+    basePrice = Math.max(basePrice, 1);
+
+    const dailyVolatility = 0.005;
+    const open = basePrice * (1 + (Math.random() - 0.5) * dailyVolatility);
+    const close = basePrice * (1 + (Math.random() - 0.5) * dailyVolatility);
+    const high = Math.max(open, close) * (1 + Math.random() * dailyVolatility * 2);
+    const low = Math.min(open, close) * (1 - Math.random() * dailyVolatility * 2);
+
+    // Volume varies with price movements
+    const priceChange = Math.abs(close - open) / open;
+    const baseVolume = symbol.startsWith('RELIANCE') ? 5000000 :
+                      symbol.startsWith('AAPL') ? 50000000 : 2000000;
+    const volume = Math.floor(baseVolume * (1 + priceChange * 5) * (0.5 + Math.random()));
+
     data.push({
       date: new Date(Date.now() - (99 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      open,
-      high,
-      low,
-      close,
+      open: Number(open.toFixed(2)),
+      high: Number(high.toFixed(2)),
+      low: Number(low.toFixed(2)),
+      close: Number(close.toFixed(2)),
       volume
     });
   }
-  
+
   return data;
 }
 
